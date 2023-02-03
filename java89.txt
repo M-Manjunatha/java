@@ -1,0 +1,71 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+<form action="page2" method="get">
+
+<input type="text" name="n1">${error1} <br>
+<input type="text" name="n2">${error2}<br>
+<input type="submit" name="n3" value="submit"><br>
+</form>
+
+</body>
+</html>
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+ID=${n1} 
+Name=${n2} 
+
+
+</body>
+</html>
+
+
+package p8mvcpkg;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+public class controller1 {
+
+	
+		@GetMapping("/")
+		public String view() {
+			return "page2";
+		}
+		
+		@RequestMapping("/page2")
+		public String viewPage(@RequestParam String n1,@RequestParam String n2,Model model) {
+			model.addAttribute("n1", n1);
+			model.addAttribute("n2", n2);
+//			if(n1=="") {
+//				model.addAttribute("error1", "please fill the field");
+//				return "index";
+//			}
+//			if(n2=="") {
+//				model.addAttribute("error2", "no");
+//				return "index";
+//			}
+			return "page2";
+		}
+}
