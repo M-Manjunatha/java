@@ -1,0 +1,224 @@
+package com.durgesh;
+
+import javax.persistence.EntityManagerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+
+@Configuration
+@EnableJpaRepositories(basePackages = { "com.durgesh" })
+public class AppConfig {
+	
+	@Bean
+	public LocalEntityManagerFactoryBean entityManagerFactory() {
+		LocalEntityManagerFactoryBean factoryBean = new LocalEntityManagerFactoryBean();
+		factoryBean.setPersistenceUnitName("SpringJPAPer");
+
+		return factoryBean;
+	}
+
+	@Bean
+	public JpaTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
+		JpaTransactionManager transactionManager = new JpaTransactionManager();
+		transactionManager.setEntityManagerFactory(entityManagerFactory);
+
+		return transactionManager;
+	}
+}
+
+===================================================================================================================
+(Message_Main.java)
+
+package com.durgesh;
+
+import java.util.List;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+public class Message_Main {
+
+	public static void main(String[] args) {
+		AnnotationConfigApplicationContext appContext = new AnnotationConfigApplicationContext();
+		appContext.scan("com.durgesh");
+		appContext.refresh();
+		MessageService messageService = (MessageService) appContext.getBean("MessageService");
+		messageService.Save(104, "Durgesh");
+		messageService.Save(105, "Ayush");
+		List<Message> al = messageService.getMessages();
+		for (Message m : al) {
+			System.out.println(m.getMid() + " " + m.getMessage());
+		}
+		appContext.close();
+	}
+}
+
+========================================================================================================================
+(Message.java)
+
+package com.durgesh;
+
+import javax.persistence.*;
+
+import org.springframework.data.annotation.Persistent;
+
+@Entity
+@Table(name = "Message")
+public class Message {
+	@Id
+	private int mid;
+	private String message;
+
+	public Message() {
+	}
+
+	public Message(int mid, String message) {
+		super();
+		this.mid = mid;
+		this.message = message;
+	}
+
+	public int getMid() {
+		return mid;
+	}
+
+	public void setMid(int mid) {
+		this.mid = mid;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+}
+
+================================================================================================
+(MessageRepository.java)
+
+package com.durgesh;
+
+import javax.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@Transactional
+public interface MessageRepository extends JpaRepository<Message, Integer> {
+}
+
+====================================================================================================
+(MessageService.java)
+
+package com.durgesh;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service("MessageService")
+public class MessageService {
+
+	@Autowired
+	MessageRepository ar;
+
+	public void Save(int mid, String message) {
+		Message m = new Message();
+		m.setMid(mid);
+		m.setMessage(message);
+		ar.save(m);
+	}
+
+	public List<Message> getMessages() {
+		List<Message> al = (List<Message>) ar.findAll();
+		return al;
+	}
+}
+
+=======================================================================================================
+
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence 
+http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+	<persistence-unit name="SpringJPAPer"
+		transaction-type="RESOURCE_LOCAL">
+		<class>com.durgesh.Message</class>
+		<properties>
+			<property name="javax.persistence.jdbc.url"
+				value="jdbc:mysql://localhost:3306/student" />
+			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.password"
+				value="" />
+			<property name="javax.persistence.jdbc.driver"
+				value="com.mysql.cj.jdbc.Driver" />
+		</properties>
+	</persistence-unit>
+</persistence>
+
+==============================================================================================
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.durgesh</groupId>
+  <artifactId>Program-07_Test</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Program-07_Test Maven Webapp</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+  
+  <dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>2.4.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>5.3.9</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.5.7.Final</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.25</version>
+		</dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>Program-07_Test</finalName>
+  </build>
+</project>
+
+===========================================================================================
+
+index.jsp
+
+<html>
+<body>
+<h2>Hello World!</h2>
+</body>
+</html>
+
+
+
+
